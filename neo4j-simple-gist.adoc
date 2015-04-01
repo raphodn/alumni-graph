@@ -1,0 +1,36 @@
+== Alumni Graph
+
+http://gist.neo4j.org/
+
+=== Simple graph
+
+//setup
+[source,cypher]
+----
+CREATE (s:School {name:"INSA de Lyon"})-[g:GRADUATION_YEAR]->(y:Year {name:"2014" })
+CREATE (y)-[a:ALUMNI]->(p1:Person {name:"Raphael" })
+CREATE (y)-[:ALUMNI]->(p2:Person {name:"Clement" })
+CREATE (p1)-[:IS]->(r1:Position {type:"Job (CDI)", title:"Full-Stack R&D Developer", start:"2015/04/08"})
+CREATE (r1)-[:IN]->(c1:Company {name:"Ekimetrics" })
+CREATE (r1)-[:WAS]->(r2:Position {type:"Personal Project", title:"Lead Developer", start:"2014/10/01", end:"2015/03/01"})
+CREATE (r2)-[:IN]->(proj:Project {name:"wdi" })
+CREATE (p2)-[:IS]->(r3:Position {type:"Job (CDI)", title:"Consultant", start:"2014/09/01"})
+CREATE (r3)-[:IN]->(c2:Company {name:"Solucom" })
+RETURN *
+----
+
+And render as a graph.
+
+//graph
+
+=== Now query the graph to show all the things you like
+
+[source,cypher]
+----
+MATCH (you:Person {name:"Raphael"})-[like:LIKE]->(liked)
+RETURN you.name AS who, type(like) AS how, liked.name AS what
+----
+
+And render as a table.
+
+//table
