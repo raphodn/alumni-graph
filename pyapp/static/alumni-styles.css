@@ -1,0 +1,8 @@
+.bigdivider {
+  height: 5px;
+  width:100%;
+  display:block; 
+  margin: 15px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
