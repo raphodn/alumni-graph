@@ -3,52 +3,82 @@ Each single Node and Relationship can have named attributes referred to as **Pro
 
 The database contains time nodes managed by the GraphAware Framework that will not be explained here. However the relationships of our nodes towards time nodes are detailed. 
 
-##Labels 
-####Label *Person*
- - first_name
- - last_name
- - email
- - bio
- - link
 
-####Label *University*
- - name
+## Labels 
 
-####Label *School*
- - name
+#### Label *Person*
 
-####Label *Laboratory*
- - name
+- id (UNIQUE CONSTRAINT)
+- first_name
+- last_name
+- email
+- bio
+- link
 
-####Label *Company*
- - name
 
-####Label *Studies*
+#### Label *University*
 
- - name
- - description
+- name (UNIQUE CONSTRAINT)
 
-####Label *Job*
 
- - name
- - description
+#### Label *School*
 
-##Relationships
-####From *Person* to *Studies*
- - **STUDIED** : (:Person) - [:STUDIED] -> (:Studies)
+- name (UNIQUE CONSTRAINT)
 
-####From *Person* to *Job*
- - **WORKED** : (:Person) - [:WORKED] -> (:Job)
 
-####From *Person* to *Time*
- - **BORN** : (:Person) - [:BORN] -> (:Time)
+#### Label *Laboratory*
 
-####From *Studies*, *Job* to *University*, *School*, *Laboratory*, *Company*
- - **AT** : (Studies) - [:AT] -> (:University) 
+- name (UNIQUE CONSTRAINT)
 
-####From *Studies*, *Job* to *Time*
- - **FROM** : (Studies) - [:FROM] -> [:TIME]
- - **TO** : (Studies) - [:TO] -> [:TIME]
 
-####From *Lab* to *School* and from *School* to *University*
- - **BELONGS_TO** : (:School) - [:BELONGS_TO] -> (:University)
+#### Label *Company*
+
+- name (UNIQUE CONSTRAINT)
+
+
+#### Label *Studies*
+
+- id (UNIQUE CONSTRAINT)
+- name
+- description
+
+
+#### Label *Job*
+
+- id (UNIQUE CONSTRAINT)
+- name
+- description
+
+
+
+## Relationships
+
+#### From *Person* to *Studies*
+
+- **STUDIED** : (:Person) - [:STUDIED] -> (:Studies)
+
+
+#### From *Person* to *Job*
+
+- **WORKED** : (:Person) - [:WORKED] -> (:Job)
+
+
+#### From *Person* to *Time*
+
+- **BORN** : (:Person) - [:BORN] -> (:Time)
+
+
+#### From *Studies*, *Job* to *University*, *School*, *Laboratory*, *Company*
+
+- **AT** : (Studies) - [:AT] -> (:University) 
+
+
+#### From *Studies*, *Job* to *Time*
+
+- **FROM** : (Studies) - [:FROM] -> [:TIME]
+- **TO** : (Studies) - [:TO] -> [:TIME]
+
+
+#### From *Lab* to *School* and from *School* to *University*
+
+- **BELONGS_TO** : (:School) - [:BELONGS_TO] -> (:University)
