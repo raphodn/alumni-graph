@@ -10,10 +10,11 @@ View, explore, search and add new content in the graph database.
 
 ### Stack & Dependencies
 
-Backend: Python 2.7
+Backend
+	- Python 2.7
 	- Flask
 	- py2neo
-	- Flask-OAuthlib
+	- (Flask-OAuthlib for linkedin connector /future)
 
 Database: Neo4j
 
@@ -33,9 +34,11 @@ Frontend: AngularJS
 
 ## Run
 
+- run the Neo4j server
+
 - run the Python server
 
-		python alumni-graph.py
+		python run.py
 
 - Launch the browser
 
