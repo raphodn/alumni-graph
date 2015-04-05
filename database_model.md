@@ -35,10 +35,10 @@ The database contains time nodes managed by the GraphAware Framework that will n
 
 ##Relationships
 ####From *Person* to *Studies*
- - **DID** : (:Person) - [:STUDIED] -> (:Studies)
+ - **STUDIED** : (:Person) - [:STUDIED] -> (:Studies)
 
 ####From *Person* to *Job*
- - **DID** : (:Person) - [:WORKED] -> (:Job)
+ - **WORKED** : (:Person) - [:WORKED] -> (:Job)
 
 ####From *Person* to *Time*
  - **BORN** : (:Person) - [:BORN] -> (:Time)
