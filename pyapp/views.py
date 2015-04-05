@@ -87,7 +87,7 @@ def get_schools():
 @app.route('/api/school', methods=['POST'])
 def create_school():
     if not request.json or not 'name' in request.json:
-        return make_error(400, 1, 'missing School data. Expecting name fields')
+        return make_error(400, 1, 'missing School data. Expecting name field')
     else:
         name = request.json['name']
         create_school(name)
@@ -166,6 +166,12 @@ def get_position(position_id):
 
 
 
+
+
+
+############################################################################################
+# from https://github.com/nicolewhite/neo4j-flask
+############################################################################################
 
 
 

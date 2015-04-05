@@ -1,38 +1,34 @@
 'use strict';
 
-dbapp.factory('dbFactory', ['$http', function($http) {
+alumniapp.factory('apiFactory', ['$http', function($http) {
         
-	var dbFactory = {};
+	var apiFactory = {};
 
 
 
 	var apiUrlBase = '/api/';
 
 
-	dbFactory.getAllData = function () {
+	apiFactory.getAllData = function () {
     	return $http({
-	      	url: apiUrlBase,
+	      	url: apiUrlBase + 'all/',
 	      	method: 'GET'
     	});
 	};
 
-	dbFactory.postDatabase = function(db_file) {
+
+	apiFactory.postSchool = function() {
 
 	   	return $http({
 			url: apiUrlBase,
 			method: 'POST',
-			headers: {'Content-Type': undefined},
-			transformRequest: function (data) {
-				var fd = new FormData();
-				fd.append("db", db_file);
-   				return fd;
-   			}
+			
    		});
 	};
 
 
 
 
-    return dbFactory;
+    return apiFactory;
 
-}]);//end of dbFactory
+}]);//end of apiFactory

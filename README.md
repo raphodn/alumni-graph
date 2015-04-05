@@ -11,15 +11,19 @@ View, explore, search and add new content in the graph database.
 ### Stack & Dependencies
 
 Backend
-	- Python 2.7
-	- Flask
-	- py2neo
-	- (Flask-OAuthlib for linkedin connector /future)
+- Python 2.7
+- Flask
+- py2neo
+- (Flask-OAuthlib for linkedin connector /future)
 
 Database: Neo4j
 
 Frontend: AngularJS
 
+
+### Database model
+
+see https://github.com/raphodn/alumni-graph/blob/master/database_model.md
 
 
 ### Functionnalities

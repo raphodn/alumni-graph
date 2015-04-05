@@ -27,6 +27,13 @@ class User:
             #return False
 
 
+
+
+    ############################################################################################
+    # from https://github.com/nicolewhite/neo4j-flask
+    ############################################################################################
+
+
     def set_password(self, password):
         self.password = bcrypt.encrypt(password)
         return self
@@ -112,6 +119,9 @@ class User:
 
 
 
+
+
+
 ## Various functions.
 ## These are for the views.
 
@@ -121,9 +131,7 @@ def find_node_label(node):
     labels = []
     for label in node.labels:
         labels.append(label)
-    return labels[0] # suppose every node has only 1 label
-
-
+    return labels[0] # for now suppose every node has only 1 label
 
 
 
@@ -148,7 +156,7 @@ def relationship_to_array(rel):
     """
     all_relationships: (iterator)
     rel in all_relationships:
-        rel: ()
+        rel: Relationship
         rel.start_node: Node
         rel.type: String
         rel.properties: PropertySet
@@ -159,6 +167,7 @@ def relationship_to_array(rel):
     array.append(rel.type)
     array.append(rel.properties)
     array.append(rel.end_node.properties)
+    # [{start_node properties}, REL_TYPE, {rel properties}, {end_node properties}]
     return array
 
 
@@ -209,6 +218,21 @@ def get_all_years_from_school_field(school_name, field_name):
 def get_all_alumni_from_school_field_year(school_name, field_name, year):
     all_years_from_school_field = graph.cypher.execute("MATCH (School { name:{S}})--(Field { name:{F}})--(Year {name:{Y}}) RETURN year", {"S": school_name, "F": field_name, "Y": year})
     return all_years_from_school_field
+
+
+
+
+
+
+
+
+
+
+
+############################################################################################
+# from https://github.com/nicolewhite/neo4j-flask
+############################################################################################
+
 
 
 # For the profile/<username> view.

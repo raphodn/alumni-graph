@@ -1,15 +1,15 @@
 'use strict';
 
-var dbapp = angular.module("dbApp", ['angularFileUpload', 'ngActivityIndicator']);
+var alumniapp = angular.module("dbApp", ['angularFileUpload', 'ngActivityIndicator']);
 
 
-dbapp.config(['$interpolateProvider', function($interpolateProvider) {
+alumniapp.config(['$interpolateProvider', function($interpolateProvider) {
 	$interpolateProvider.startSymbol('[[');
 	$interpolateProvider.endSymbol(']]');
 }]);
 
 
-dbapp.controller("MainController", ['$scope', 'dbFactory', '$activityIndicator',
+alumniapp.controller("MainController", ['$scope', 'apiFactory', '$activityIndicator',
 	function($scope, dbFactory, $activityIndicator) {
 
 
