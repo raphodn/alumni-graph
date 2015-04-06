@@ -11,7 +11,7 @@ alumniapp.factory('apiFactory', ['$http', function($http) {
 
 	apiFactory.getAllData = function () {
     	return $http({
-	      	url: apiUrlBase + 'all/',
+	      	url: apiUrlBase + 'all',
 	      	method: 'GET'
     	});
 	};

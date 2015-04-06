@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
 
-<html lang="en" ng-app="dbApp">
+<html lang="en" ng-app="alumniApp">
 
 	<head>
 	    <meta charset="utf-8">
@@ -12,7 +12,7 @@
 	    <meta name="description" content="">
 	    <meta name="author" content="">
 
-	    <title>Database viewer</title>
+	    <title>Alumni Graph</title>
 
 	    <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">-->
 	    <link rel="stylesheet" href="static/bootstrap.min.css">
@@ -33,128 +33,56 @@
 
 		<div class="container">
 			<br>
+			<div class="row">
+				
+				<div class="col-sm-4">
+					<h2 class="text-center">Config</h2>
 
-			<section>
-				<div class="row">
-					<div class="col-sm-4">
-						<h4>STEP 1</h4>
-						<p>Select a database to work with</p>
-						<p><em>[[databases.length]] database<span ng-if="databases.length > 1">s</span> available</em></p>
+					<div class="bigdivider"></div>
+
+					<div class="row text-center">
+						<div class="col-sm-4 pointer" ng-click="tab.value=1" ng-class="{'selected':tab.value==1}">View</div>
+						<div class="col-sm-4 pointer" ng-click="tab.value=2" ng-class="{'selected':tab.value==2}">Search</div>
+						<div class="col-sm-4 pointer" ng-click="tab.value=3" ng-class="{'selected':tab.value==3}">Create</div>
 					</div>
-					<div class="col-sm-7">
-						<form class="form-inline">
-							<div class="form-group">
-				                <label>Upload a database</label>
-				                <input class="form-control" type="file" ng-file-select="" ng-model="files" ng-multiple="false" name="file" accept="'.db'">
-				                <button id="submit" type="submit" class="btn btn-primary" ng-click="uploadDatabase()" ng-disabled="!files">Upload</button>
-				                <button ng-if="files" class="btn btn-sm btn-danger" ng-click="removeFile()">clear</button>
-				            </div>
-		        		</form>
-		        		<br>
-						<form class="form-inline">
-							<div class="form-group">
-								<label>Select a database</label>
-								<select class="form-control" ng-model="workingData.database" ng-change="databaseSelected()" ng-options="db as db for db in databases" ng-disabled="files">
-									<option value="">-----</option>
-		                    	</select>
-		                    	<br><p ng-if="!databases"><em>no databases yet</em></p>
-                    		</div>
-                    	</form>
-		        	</div>
-		        	<div class="col-sm-1">
-		        		<span ng-activity-indicator></span>
-		        	</div>
-		        </div>
-			</section>
 
+					<div class="bigdivider"></div>
 
-			<section ng-if="workingData.database && working_database_tables">
-				<div class="bigdivider"></div>
-				<div class="row">
-					<div class="col-sm-4">
-						<h4>STEP 2</h4>
-						<p>Select a table from this database</p>
-						<p><em>[[working_database_tables.length]] table<span ng-if="working_database_tables.length > 1">s</span> available</em></p>
+					<div ng-if="tab.value==1">
+						<p>You are in View</p>
+						<p>Showing all data</p>
 					</div>
-					<div class="col-sm-8">
-						<br>
-						<form class="form-inline">
-							<div class="form-group">
-								<label>select a table</label>
-								<select class="form-control" ng-model="workingData.table" ng-change="tableSelected()" ng-options="tbl as tbl for tbl in working_database_tables">
-									<option value="">-----</option>
-			                    </select>
-			                    <br><p ng-if="workingData.database && !working_database_tables"><em>no tables in this database</em></p>
-			                </div>
-                		</form>
-                	<div>
-                </div>
-			</section>
 
+					<div ng-if="tab.value==2">You are in Search</div>
 
-			<section ng-if="workingData.table && working_database_table_columns">
-				<div class="bigdivider"></div>
-				<div class="row">
-					<div class="col-sm-4">
-						<h4>STEP 3</h4>
-						<p>Select a column you wish to display the data</p>
-						<p><em>[[working_database_table_columns.length]] column<span ng-if="working_database_table_columns.length > 1">s</span> available</em></p>
+					<div ng-if="tab.value==3">You are in Create</div>
+
+				</div>
+
+				<div class="col-sm-7">
+					<h2 class="text-center">Graph</h2>
+
+					<div class="bigdivider"></div>
+
+					<div>
+						<h4>Nodes</strong></h4>
+						<p>count: [[all_nodes.length]]</p>
+						<p ng-repeat="node in all_nodes">[[node]]</p>
 					</div>
-					<div class="col-sm-8">
-						<br>
-						<form class="form-inline">
-							<div class="form-group">
-								<label>Select a column</label>
-								<select class="form-control" ng-model="workingData.column" ng-change="columnSelected()" ng-options="col[1] as col[1] for col in working_database_table_columns">
-									<option value="">-----</option>
-			                    </select>
-			                    <br><p ng-if="workingData.table && !working_database_tables"><em>no columns in this table</em></p>
-			                </div>
-		                </form>
-		            </div>
-		        </div>
-			</section>
-
-
-			<section ng-if="showTable">
-				<div class="bigdivider"></div>
-				<div class="row">
-					<div class="col-sm-4">
-						<h4>FINAL TABLE</h4>
-						<p>[[workingData.database]] >> [[workingData.table]] >> [[workingData.column]]</p>
-						<br>
-						<p>Total values: [[columnValuesFullLength]]</p>
-						<p>Displayed values: [[columnData.length]]</p>
-						<p>Clipped values: [[columnValuesFullLength - columnData.length]]</p>
-						<p><small>(Clipped rows: [[columnValuesMissingRows]] of [[columnValuesFullRows]])</small></p>
-						<br><br>
-						<button class="btn btn-primary" ng-click="reset()">Reset</button>
-					</div>
-					<div class="col-sm-8">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Rank</th>
-									<th>Value</th>
-									<th>Count</th>
-									<th>Average age</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="value in columnValues">
-									<td>[[$index + 1]]</td>
-									<td>[[ value ]]</td>
-									<td>[[ columnData[$index][1] ]]</td>
-									<td>[[ columnData[$index][0] ]]</td>
-								</tr>
-							</tbody>
-						</table>
+					<br>
+					<div>
+						<h4>Relationships</h4>
+						<p>count: [[all_rels.length]]</p>
+						<p ng-repeat="rel in all_rels">[[rel]]</p>
 					</div>
 				</div>
-			</section>
 
+				<div class="col-sm-1">
+		        	<span ng-activity-indicator></span>
+		        </div>
+
+			</div>
 		</div><!-- end of container -->
-
 
 	</body>
 </html>

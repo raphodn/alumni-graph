@@ -1,6 +1,6 @@
 'use strict';
 
-var alumniapp = angular.module("dbApp", ['angularFileUpload', 'ngActivityIndicator']);
+var alumniapp = angular.module("alumniApp", ['angularFileUpload', 'ngActivityIndicator']);
 
 
 alumniapp.config(['$interpolateProvider', function($interpolateProvider) {
@@ -10,15 +10,17 @@ alumniapp.config(['$interpolateProvider', function($interpolateProvider) {
 
 
 alumniapp.controller("MainController", ['$scope', 'apiFactory', '$activityIndicator',
-	function($scope, dbFactory, $activityIndicator) {
+	function($scope, apiFactory, $activityIndicator) {
 
 
 
 
-	$scope.spinner = {};
+	$scope.tab = {};
+	$scope.tab.value = 1;
 
 	//our databases names
-	$scope.databases = [];
+	$scope.all_nodes;
+	$scope.all_rels;
 	//object we are working on
 	$scope.workingData = {};
 	// tables of the database we are working on
@@ -35,53 +37,23 @@ alumniapp.controller("MainController", ['$scope', 'apiFactory', '$activityIndica
 	 *
 	*/
 
-	dbFactory.getDatabases()
+	$activityIndicator.startAnimating();
+
+	apiFactory.getAllData()
     .success(function(data) {
-    	$scope.databases = data['databases'];
+    	$activityIndicator.stopAnimating();
+    	console.log(data);
+    	$scope.all_nodes = data['nodes'];
+    	$scope.all_rels = data['relationships'];
     })
     .error(function(error) {
+    	$activityIndicator.stopAnimating();
     	alert(error['message']);
     	console.log(error);
     })
 
 
 
-	$scope.uploadDatabase = function() {
-
-		if ($scope.files != undefined) {
-			
-			$activityIndicator.startAnimating();
-
-			dbFactory.postDatabase($scope.files[0]) //multi-upload possible
-			.success(function(data) {
-				$activityIndicator.stopAnimating();
-				$scope.databases = data['databases'];
-				$scope.files = null;
-			})
-			.error(function(error) {
-				$activityIndicator.stopAnimating();
-				$scope.files = null;
-				alert(error['message']);
-				console.log(error);
-			});
-		}
-		else {}
-	};
-
-
-	$scope.removeFile = function() {
-		$scope.files = null;
-	};
-
-
-
-
-
-
-	$scope.reset = function() {
-		$scope.workingData = {};
-		$scope.showTable = false;
-	};
 
 
 

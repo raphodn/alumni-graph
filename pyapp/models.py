@@ -147,8 +147,10 @@ def node_recordlist_to_array(all_nodes):
     """
     array = []
     for node in all_nodes:
-        array.append(find_node_label(node[0]))
-        array.append(node[0].properties)
+        node_array = []
+        node_array.append(find_node_label(node[0]))
+        node_array.append(node[0].properties)
+        array.append(node_array)
     return array
 
 
