@@ -14,6 +14,7 @@ The database contains time nodes managed by the GraphAware Framework that will n
 - email
 - bio
 - link
+- privacy ?
 
 
 #### Label *University*
@@ -34,6 +35,7 @@ The database contains time nodes managed by the GraphAware Framework that will n
 #### Label *Company*
 
 - name (UNIQUE CONSTRAINT)
+- HQ address ?
 
 
 #### Label *Studies*
@@ -48,6 +50,7 @@ The database contains time nodes managed by the GraphAware Framework that will n
 - id (UNIQUE CONSTRAINT)
 - name
 - description
+- address ?
 
 
 

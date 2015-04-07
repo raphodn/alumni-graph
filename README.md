@@ -1,3 +1,5 @@
+in progress
+
 # Graph Database of INSA TC alumni
 
 ## Goal
@@ -47,5 +49,3 @@ see https://github.com/raphodn/alumni-graph/blob/master/database_model.md
 - Launch the browser
 
 		http://localhost:5000
-
-- 

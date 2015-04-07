@@ -7,116 +7,130 @@ authenticate("localhost:7474", "neo4j", "shanghai")
 #graph = Graph(os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474') + '/db/data/')
 graph = Graph("http://localhost:7474/db/data/")
 
+"""
+py2neo API
 
-## The User class.
-## This class is for handling 
-class User:
-    def __init__(self, username):
-        self.username = username
+graph.find() ; graph.match()
+    > RETURNS generator
+    > elem in generator: Node or Relationship
 
-    def find(self):
-        user = graph.find_one("User", "username", self.username)
-        return user
+graph.execute() > RETURNS RecordList
+    > elem in RecordList: Record
+    > elem[0]: Node
+
+
+graph.find(label, property_key=None, property_value=None, limit=None)
+graph.find_one(label, property_key=None, property_value=None)
+
+
+"""
+
+
+class Person:
+    """
+    - id (UNIQUE CONSTRAINT)
+    - first_name
+    - last_name
+    - email
+    - bio
+    - link
+    - privacy ?
+    """
+    def __init__(self, id=None):
+        self.id = id
+
+    def get_person(self):
+        person = graph.find_one("Person", "id", self.id)
+        if person:
+            person_data = []
+            person_data.append(node_to_array(person))
+            return person_data
+        else:
+            return None
+
+    def search_persons(self):
+        """
+        Privacy issues ?
+        """
+        search_persons = graph.cypher.execute("MATCH (person:Person) WHERE person.name =~ '(?i).*." + self.name + ".*' RETURN person")
+        return node_recordlist_to_array(search_persons)
+
+    def get_all_persons(self):
+        all_persons = graph.find("Person")
+        return nodelist_to_array(all_persons)
 
     def create(self, first_name, last_name):
-        #if not self.find():
-        user = Node("User", first_name=first_name, last_name=last_name)
-        graph.create(user)
+        person = Node("Person", id=person_id, first_name=first_name, last_name=last_name)
+        graph.create(person)
         return True
-        #else:
-            #return False
 
 
 
+class School:
+    """
+    name (UNIQUE CONSTRAINT)
+    """
+    def __init__(self, name=None):
+        self.name = name
 
-    ############################################################################################
-    # from https://github.com/nicolewhite/neo4j-flask
-    ############################################################################################
+    def get_school(self):
+        school = graph.find_one("School", "name", self.name) # graph.cypher.execute_one("MATCH (school:School {name:{S}}) RETURN school.name", {"S": self.name})
+        if school:
+            school_data = []
+            school_data.append(node_to_array(school))
+            return school_data
+        else:
+            return None
 
+    def search_schools(self):
+        search_schools = graph.cypher.execute("MATCH (school:School) WHERE school.name =~ '(?i).*." + self.name + ".*' RETURN school")
+        return node_recordlist_to_array(search_schools)
 
-    def set_password(self, password):
-        self.password = bcrypt.encrypt(password)
-        return self
+    def get_all_schools(self):
+        all_schools = graph.find("School") # graph.cypher.execute_one("MATCH (school:School) RETURN school.name")
+        return nodelist_to_array(all_schools)
 
-    def register(self):
-        if not self.find():
-            user = Node("User", username=self.username, password=self.password)
-            graph.create(user)
+    def create(self):
+        if not self.get_school():
+            school = Node("School", name=name)
+            graph.create(school)
             return True
         else:
             return False
 
-    def verify_password(self, password):
-        user = self.find()
-        if user:
-            return bcrypt.verify(password, user['password'])
+
+
+class Company:
+    """
+    name (UNIQUE CONSTRAINT), HQ address ?
+    """
+    def __init__(self, name=None):
+        self.name = name
+
+    def get_company(self):
+        company = graph.find_one("Company", "name", self.name)
+        if company:
+            company_data = []
+            company_data.append(node_to_array(company))
+            return company_data
+        else:
+            return None
+
+    def search_companies(self):
+        search_companies = graph.cypher.execute("MATCH (company:Company) WHERE company.name =~ '(?i).*." + self.name + ".*' RETURN company")
+        return node_recordlist_to_array(search_companies)
+
+    def get_all_companies(self):
+        all_companies = graph.find("Company")
+        return nodelist_to_array(all_companies)
+
+    def create(self):
+        if not self.get_company():
+            company = Node("Company", name=name)
+            graph.create(company)
+            return True
         else:
             return False
-
-    def add_post(self, title, tags, text):
-        import uuid
-
-        user = self.find()
-        post = Node(
-            "Post",
-            id=str(uuid.uuid4()),
-            title=title,
-            text=text,
-            timestamp=timestamp(),
-            date=date()
-        )
-        rel = Relationship(user, "PUBLISHED", post)
-        graph.create(rel)
-
-        tags = [x.strip() for x in tags.lower().split(',')]
-        for t in tags:
-            tag = graph.merge_one("Tag", "name", t)
-            rel = Relationship(tag, "TAGGED", post)
-            graph.create(rel)
-
-    def like_post(self, post_id):
-        user = self.find()
-        post = graph.find_one("Post", "id", post_id)
-        graph.create_unique(Relationship(user, "LIKED", post))
-
-    def get_similar_users(self):
-        # Find three users who are most similar to the logged-in user
-        # based on tags they've both blogged about.
-        query = """
-        MATCH (you:User)-[:PUBLISHED]->(:Post)<-[:TAGGED]-(tag:Tag),
-              (they:User)-[:PUBLISHED]->(:Post)<-[:TAGGED]-(tag)
-        WHERE you.username = {username} AND you <> they
-        WITH they, COLLECT(DISTINCT tag.name) AS tags, COUNT(DISTINCT tag) AS len
-        ORDER BY len DESC LIMIT 3
-        RETURN they.username AS similar_user, tags
-        """
-
-        similar = graph.cypher.execute(query, username=self.username)
-        return similar
-
-    def get_commonality_of_user(self, username):
-        # Find how many of the logged-in user's posts the other user
-        # has liked and which tags they've both blogged about.
-        query = """
-        MATCH (they:User {username:{they}}),
-              (you:User {username:{you}})
-        OPTIONAL MATCH (they)-[:LIKED]->(post:Post)<-[:PUBLISHED]-(you)
-        OPTIONAL MATCH (they)-[:PUBLISHED]->(:Post)<-[:TAGGED]-(tag:Tag),
-                       (you)-[:PUBLISHED]->(:Post)<-[:TAGGED]-(tag)
-        RETURN COUNT(DISTINCT post) AS likes, COLLECT(DISTINCT tag.name) AS tags
-        """
-
-        result = graph.cypher.execute(query,
-                                      they=username,
-                                      you=self.username)
-
-        result = result[0]
-        common = dict()
-        common['likes'] = result.likes
-        common['tags'] = result.tags if len(result.tags) > 0 else None
-        return common
-
-
 
 
 
@@ -135,65 +149,85 @@ def find_node_label(node):
 
 
 
-
-def node_recordlist_to_array(all_nodes):
+def node_to_array(node):
     """
-    all_nodes: RecordList
-    node in all_nodes:
-        node: Record (or Node ??)
-        node[0].labels: LabelSet
-        node[0].properties: PropertySet
-        node[0]['name'] or node[0].properties['name']
+    node: Node
+    node.labels: LabelSet
+    node.properties: PropertySet
+    node['name'] or node.properties['name']
     """
     array = []
-    for node in all_nodes:
-        node_array = []
-        node_array.append(find_node_label(node[0]))
-        node_array.append(node[0].properties)
-        array.append(node_array)
+    
+    array.append(find_node_label(node))
+    array.append(node.properties)
+    
     return array
+
+
+
+def node_recordlist_to_array(recordlist):
+    """
+    recordlist: RecordList
+    record in recordlist: Record
+    record[0]: Node
+    """
+    array = []
+    
+    for record in recordlist:
+        array.append(node_to_array(record[0]))
+    
+    return array
+
+
+def nodelist_to_array(nodelist):
+    """
+    recordlist: RecordList
+    record in recordlist: Record
+    record[0]: Node
+    """
+    array = []
+    
+    for node in nodelist:
+        array.append(node_to_array(node))
+    
+    return array
+
 
 
 def relationship_to_array(rel):
     """
-    all_relationships: (iterator)
-    rel in all_relationships:
-        rel: Relationship
-        rel.start_node: Node
-        rel.type: String
-        rel.properties: PropertySet
-        rel.end_node: Node
+    rel: Relationship
+    rel.start_node: Node
+    rel.type: String
+    rel.properties: PropertySet
+    rel.end_node: Node
     """
     array = []
+    
     array.append(rel.start_node.properties)
     array.append(rel.type)
     array.append(rel.properties)
     array.append(rel.end_node.properties)
+    
     # [{start_node properties}, REL_TYPE, {rel properties}, {end_node properties}]
     return array
 
 
 
-def get_all_nodes(nodes):
-    if (nodes == 'All'):
-        query = "MATCH (n) RETURN n"
-        all_nodes = graph.cypher.execute(query) #graph.cypher.execute("MATCH (p:Person), (s:School) RETURN p.first_name, s:name")
-
-    if (nodes == 'School'):
-        query = "MATCH (school:School) RETURN school"
-        all_nodes = graph.cypher.execute(query)
-    
-    node_data = node_recordlist_to_array(all_nodes)
-    
-    return node_data
+def get_all_nodes():
+    query = "MATCH (n) RETURN n"
+    all_nodes = graph.cypher.execute(query) #graph.cypher.execute("MATCH (p:Person), (s:School) RETURN p.first_name, s:name")
+    return node_recordlist_to_array(all_nodes)
 
 
 def get_all_relationships():
     all_relationships = graph.match() #graph.cypher.execute("MATCH (n)-[r]->() RETURN r")
-    
+
     rel_data = []
     
     for rel in all_relationships:
+        # all_relationships: (py2neo generator)
+        # rel: Relationship
         rel_data.append(relationship_to_array(rel))
     
     return rel_data
@@ -235,6 +269,24 @@ def get_all_alumni_from_school_field_year(school_name, field_name, year):
 # from https://github.com/nicolewhite/neo4j-flask
 ############################################################################################
 
+
+## The User class.
+## This class is for handling 
+class User:
+    def __init__(self, username):
+        self.username = username
+
+    def find(self):
+        user = graph.find_one("User", "username", self.username)
+        return user
+
+    def create(self, first_name, last_name):
+        #if not self.find():
+        user = Node("User", first_name=first_name, last_name=last_name)
+        graph.create(user)
+        return True
+        #else:
+            #return False
 
 
 # For the profile/<username> view.

@@ -22,6 +22,9 @@ linkedin = oauth.remote_app(
 )
 """
 
+empty_values = {None, ''}
+
+
 def make_error(status_code, sub_code, message):
     response = jsonify({
         'status': status_code,
@@ -44,15 +47,18 @@ ALL DATA
 """
 @app.route('/api/all', methods=['GET'])
 def get_all():
-    return jsonify({'nodes': get_all_nodes('All'), 'relationships': get_all_relationships()})
+    return jsonify({'nodes': get_all_nodes(), 'relationships': get_all_relationships()})
 
 
 
 """
-USER API
+PERSON API
 """
-@app.route('/api/user', methods=['GET'])
-def get_users():
+@app.route('/api/person', methods=['GET'])
+def get_persons():
+    """
+    search by first_name, last_name, seperate, together ??
+    """
     return get_nodes(user)
 
 @app.route('/api/user', methods=['POST'])
@@ -81,7 +87,21 @@ SCHOOL API
 """
 @app.route('/api/school', methods=['GET'])
 def get_schools():
-    return jsonify({'nodes': get_all_nodes('School')})
+    school_name = request.args.get('name', None)
+    school_search = request.args.get('search', None)
+
+    # get all schools
+    if school_name in empty_values:
+        return jsonify({'schools': School().get_all_schools()})
+
+    else:
+        # get specific school
+        if (school_search in empty_values) or (school_search != 'True'):
+            return jsonify({'school': School(school_name).get_school()})
+
+        # search schools
+        else:
+            return jsonify({'schools': School(school_name).search_schools()})
 
 
 @app.route('/api/school', methods=['POST'])
@@ -90,12 +110,8 @@ def create_school():
         return make_error(400, 1, 'missing School data. Expecting name field')
     else:
         name = request.json['name']
-        create_school(name)
+        School(name).create()
 
-
-@app.route('/api/school/<int:school_id>', methods=['GET'])
-def get_school(school_id):
-    return get_node(school_id)
 
 
 @app.route('/api/school/<int:school_id>/fields', methods=['GET'])
@@ -137,12 +153,30 @@ COMPANY API
 """
 @app.route('/api/company', methods=['GET'])
 def get_companies():
-    return get_nodes(company)
+    company_name = request.args.get('name', None)
+    company_search = request.args.get('search', None)
+
+    # get all companies
+    if company_name in empty_values:
+        return jsonify({'companies': Company().get_all_companies()})
+
+    else:
+        # get specific company
+        if (company_search in empty_values) or (company_search != 'True'):
+            return jsonify({'company': Company(company_name).get_company()})
+
+        # search companies
+        else:
+            return jsonify({'companies': Company(company_name).search_companies()})
 
 
-@app.route('/api/company/<int:company_id>', methods=['GET'])
-def get_company(company_id):
-    return get_node(company_id)
+@app.route('/api/company', methods=['POST'])
+def create_company():
+    if not request.json or not 'name' in request.json:
+        return make_error(400, 1, 'missing Company data. Expecting name field')
+    else:
+        name = request.json['name']
+        Company.create(name)
 
 
 
